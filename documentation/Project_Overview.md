@@ -1,86 +1,111 @@
-# Global Superstore -- Business Analytics Dashboard
+# Global Superstore – Business Analytics Dashboard
 
 ## 1. Project Overview
 
-This project uses Microsoft Power BI to explore Global Superstore retail
-transactions and build an interactive business-performance dashboard.
-The analysis focuses on sales, profit, customers, products, geography,
-shipping, and returned orders.
+This project focuses on analyzing Global Superstore retail transaction data using Microsoft Power BI. The objective is to transform raw sales data into meaningful business insights through data cleaning, data modeling, DAX calculations, and interactive visualizations.
+
+The dashboard provides insights into sales performance, profitability, customer segments, product categories, regional performance, shipping operations, and returned orders.
 
 ## 2. Problem Statement
 
-A retail business needs a clear view of its sales and operational
-performance. Transaction-level data can be difficult to interpret
-without cleaning, modeling, calculations, and visual summaries. This
-project transforms the dataset into an interactive report that helps
-users investigate business performance.
+Retail businesses generate large amounts of transactional data. However, raw data does not directly provide meaningful information about business performance.
 
-## 3. Objectives
+This project addresses the challenge of analyzing sales and operational data to identify profitable products, understand customer purchasing behavior, evaluate regional performance, and identify areas requiring business improvement.
 
--   Monitor total sales, profit, orders, customers, quantity, and profit
-    margin.
--   Compare performance across time periods, customer segments,
-    products, and regions.
--   Identify high-performing and loss-making products or sub-categories.
--   Explore the relationship between discounts and profitability.
--   Review shipping performance and returned orders.
--   Present findings through interactive report pages.
+## 3. Project Objectives
 
-## 4. Dataset
+- Analyze total sales, total profit, and order performance.
+- Identify high-performing and low-performing product categories.
+- Evaluate customer segment performance.
+- Compare sales and profitability across regions and markets.
+- Analyze the relationship between discounts and profitability.
+- Evaluate shipping performance and delivery duration.
+- Analyze returned orders and return rates.
+- Develop an interactive dashboard to support data-driven decision-making.
 
-**Dataset:** Global Superstore\
-**Workbook used:** `Global Superstore.xls`\
-**Worksheets used:** Orders, Returns, People
+## 4. Dataset Description
 
-The Orders worksheet contains order-line and sales information. Returns
-contains return status by order. People contains regional manager
-information. Confirm the exact column names and dataset version in the
-workbook used for this project.
+**Dataset Name:** Global Superstore
+
+**Source File:** Global Superstore.xls
+
+**Worksheets Used:**
+- Orders – Sales transactions and product details.
+- Returns – Returned order information.
+- People – Regional manager information.
+
+**Dataset Statistics:**
+- Orders: 51,290 transaction rows.
+- Returns: 1,173 records.
+- People: 13 regional manager records.
+- Analysis Period: 2011–2014.
+- Distinct Orders: 25,035.
+- Distinct Customers: 1,590.
 
 ## 5. Tools and Technologies
 
--   Microsoft Power BI Desktop
--   Power Query for data cleaning and transformation
--   DAX for measures and calculated columns
--   Microsoft Excel as the source format
+- Microsoft Power BI Desktop
+- Power Query
+- DAX (Data Analysis Expressions)
+- Microsoft Excel
+- Data Modeling
+- Data Visualization
 
-## 6. Data Model
+## 6. Data Preparation and Transformation
 
-The report uses a dimensional model with: - `FactOrders` -- order-line
-transactions - `FactReturns` -- returned-order information -
-`DimCustomer` -- customer attributes - `DimProduct` -- product
-attributes - `DimRegion` -- region and regional manager attributes -
-`DimOrder` -- distinct order identifiers - `DimDate` -- calendar
-attributes
+The dataset was imported into Power BI and processed using Power Query.
 
-Relationships should use unique keys on the one side and
-transaction/detail rows on the many side. Use single-direction filtering
-unless a specific requirement has been tested.
+Major activities included:
+- Checking duplicate transaction identifiers.
+- Identifying missing and blank values.
+- Correcting date and numerical data types.
+- Converting Postal Code into Text.
+- Creating a Delivery Days calculated column.
+- Cleaning and standardizing return information.
+- Preparing regional manager information.
+- Creating dimension tables for customers, products, regions, orders, and dates.
 
-## 7. Report Pages
+## 7. Data Model
 
-1.  **Executive Overview** -- headline KPIs and sales trends.
-2.  **Sales & Product Analysis** -- category, sub-category, product,
-    discount, and profit analysis.
-3.  **Regional Analysis** -- geography, market, region, and manager
-    performance.
-4.  **Operations & Returns** -- shipping mode, delivery days, and
-    returns.
+The project uses a dimensional data model consisting of fact and dimension tables.
 
-## 8. Expected Outcome
+**Fact Tables:**
+- FactOrders
+- FactReturns
 
-The final report provides an interactive view of business performance
-and allows users to filter and investigate results. Actual findings and
-numerical results are documented in `Business_Insights.md` after
-validating the finished report.
+**Dimension Tables:**
+- DimCustomer
+- DimProduct
+- DimRegion
+- DimOrder
+- DimDate
 
-## 9. Author
+The model uses relationships between unique dimension keys and corresponding transaction records to support filtering and analysis.
+
+## 8. Dashboard Pages
+
+### Page 1 – Executive Overview
+Displays total sales, total profit, total orders, profit margin, monthly sales trends, and customer segment performance.
+
+### Page 2 – Sales and Product Analysis
+Analyzes category-wise sales, sub-category profitability, top-performing products, quantity, and discount patterns.
+
+### Page 3 – Regional Analysis
+Provides insights into regional sales, market performance, geographic distribution, and regional manager performance.
+
+### Page 4 – Operations and Returns
+Analyzes shipping modes, average delivery days, returned orders, return rates, and order priorities.
+
+## 9. Expected Business Outcomes
+
+The dashboard helps identify business growth trends, profitable product categories, loss-making sub-categories, customer segment contributions, and regional performance differences.
+
+It also provides insights into shipping efficiency and returned orders, helping management identify opportunities for operational improvement.
+
+## 10. Author
 
 **Poorvika HV**
 
-## 10. Disclaimer
+## 11. Disclaimer
 
-This is an educational portfolio project. Dataset ownership and
-redistribution rights remain with the dataset provider. Check the
-dataset licence before redistributing the source workbook or publishing
-underlying data.
+This project was developed for educational and portfolio purposes. Dataset ownership and redistribution rights remain with their respective owners. The analysis represents the historical dataset period and should not be interpreted as current business performance.

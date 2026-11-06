@@ -1,53 +1,81 @@
 # DAX Measures and Calculations
 
-This document records the calculations used in the Global Superstore
-Power BI report. Confirm that the table and column names match the final
-model before using each expression.
+## 1. Introduction
 
-## 1. Core KPI measures
+DAX (Data Analysis Expressions) was used in Power BI to create measures and calculations for business performance analysis.
 
-``` dax
+These calculations support KPI cards, sales comparisons, profitability analysis, time intelligence, product analysis, and operational reporting.
+
+## 2. Sales and Profitability Measures
+
+### Total Sales
+
+```dax
 Total Sales =
 SUM(FactOrders[Sales])
 ```
 
-``` dax
+Calculates the total sales revenue.
+
+### Total Profit
+
+```dax
 Total Profit =
 SUM(FactOrders[Profit])
 ```
 
-``` dax
+Calculates the overall profit generated.
+
+### Total Orders
+
+```dax
 Total Orders =
 DISTINCTCOUNT(FactOrders[Order ID])
 ```
 
-``` dax
+Counts unique customer orders.
+
+### Total Customers
+
+```dax
 Total Customers =
 DISTINCTCOUNT(FactOrders[Customer ID])
 ```
 
-``` dax
+Counts unique customers.
+
+### Total Quantity
+
+```dax
 Total Quantity =
 SUM(FactOrders[Quantity])
 ```
 
-``` dax
+Calculates the total quantity of products sold.
+
+### Profit Margin
+
+```dax
 Profit Margin =
 DIVIDE([Total Profit], [Total Sales], 0)
 ```
 
-``` dax
+Calculates profit as a percentage of sales.
+
+### Average Order Value
+
+```dax
 Average Order Value =
 DIVIDE([Total Sales], [Total Orders], 0)
 ```
 
-## 2. Time intelligence
+Calculates the average sales value per order.
 
-These measures require an active relationship from `DimDate[Date]` to
-`FactOrders[Order Date]`, and `DimDate` must be marked as the model's
-date table.
+## 3. Time Intelligence Measures
 
-``` dax
+### Previous Year Sales
+
+```dax
 Previous Year Sales =
 CALCULATE(
     [Total Sales],
@@ -55,7 +83,11 @@ CALCULATE(
 )
 ```
 
-``` dax
+Calculates sales for the corresponding period in the previous year.
+
+### Sales YoY Growth %
+
+```dax
 Sales YoY Growth % =
 DIVIDE(
     [Total Sales] - [Previous Year Sales],
@@ -64,7 +96,11 @@ DIVIDE(
 )
 ```
 
-``` dax
+Calculates year-over-year sales growth.
+
+### Previous Year Profit
+
+```dax
 Previous Year Profit =
 CALCULATE(
     [Total Profit],
@@ -72,7 +108,11 @@ CALCULATE(
 )
 ```
 
-``` dax
+Calculates profit for the corresponding period in the previous year.
+
+### Profit YoY Growth %
+
+```dax
 Profit YoY Growth % =
 DIVIDE(
     [Total Profit] - [Previous Year Profit],
@@ -81,19 +121,31 @@ DIVIDE(
 )
 ```
 
-## 3. Product and discount analysis
+Calculates year-over-year profit growth.
 
-``` dax
+## 4. Product and Discount Analysis
+
+### Average Discount
+
+```dax
 Average Discount =
 AVERAGE(FactOrders[Discount])
 ```
 
-``` dax
+Calculates the average discount across transaction rows.
+
+### Sales per Unit
+
+```dax
 Sales per Unit =
 DIVIDE([Total Sales], [Total Quantity], 0)
 ```
 
-``` dax
+Calculates average sales value per unit sold.
+
+### Loss Making Sales
+
+```dax
 Loss Making Sales =
 CALCULATE(
     [Total Sales],
@@ -101,18 +153,22 @@ CALCULATE(
 )
 ```
 
-`Loss Making Sales` sums the sales value of transaction lines whose
-profit is negative. It is not the amount of the loss; use a separate
-negative-profit measure if you need that.
+Calculates the sales value associated with transaction rows that generated negative profit.
 
-## 4. Shipping and returns
+## 5. Shipping and Returns Measures
 
-``` dax
+### Average Delivery Days
+
+```dax
 Average Delivery Days =
 AVERAGE(FactOrders[Delivery Days])
 ```
 
-``` dax
+Calculates the average number of days between order date and ship date.
+
+### Returned Orders
+
+```dax
 Returned Orders =
 CALCULATE(
     DISTINCTCOUNT(FactReturns[Order ID]),
@@ -120,7 +176,11 @@ CALCULATE(
 )
 ```
 
-``` dax
+Counts distinct returned orders.
+
+### Return Rate
+
+```dax
 Return Rate =
 DIVIDE(
     [Returned Orders],
@@ -129,36 +189,46 @@ DIVIDE(
 )
 ```
 
-**Important model note:** `FactReturns` should be filtered by the
-relevant order dimension or another validated relationship. Ensure the
-returned-order measure and denominator use the same order population and
-filter context. If the return table contains only returned orders,
-confirm that the `Returned` value is consistently `"Yes"`.
+Calculates the percentage of returned orders against total orders.
 
-## 5. Formatting recommendations
+## 6. DAX Concepts Used
 
-  Measure                 Suggested format
-  ----------------------- ------------------
-  Total Sales             Currency
-  Total Profit            Currency
-  Total Orders            Whole number
-  Total Customers         Whole number
-  Total Quantity          Whole number
-  Profit Margin           Percentage
-  Average Order Value     Currency
-  Sales YoY Growth %      Percentage
-  Profit YoY Growth %     Percentage
-  Average Discount        Percentage
-  Average Delivery Days   Decimal number
-  Return Rate             Percentage
+The project demonstrates the following DAX concepts:
 
-## 6. Calculated column in Power Query
+- SUM – Aggregation of numerical values.
+- DISTINCTCOUNT – Counting unique identifiers.
+- AVERAGE – Calculating average values.
+- CALCULATE – Modifying filter context.
+- DIVIDE – Safe division with an alternate result.
+- SAMEPERIODLASTYEAR – Time intelligence.
+- Measure-based KPI calculations.
+- Percentage and profitability calculations.
 
-The `Delivery Days` column is created in Power Query, not DAX:
+## 7. Measure Formatting
 
-``` powerquery
-Duration.Days([Ship Date] - [Order Date])
-```
+| Measure | Format |
+|---|---|
+| Total Sales | Currency |
+| Total Profit | Currency |
+| Total Orders | Whole Number |
+| Total Customers | Whole Number |
+| Total Quantity | Whole Number |
+| Profit Margin | Percentage |
+| Average Order Value | Currency |
+| Sales YoY Growth % | Percentage |
+| Profit YoY Growth % | Percentage |
+| Average Discount | Percentage |
+| Average Delivery Days | Decimal Number |
+| Return Rate | Percentage |
 
-It calculates the number of calendar days between the order date and
-ship date.
+## 8. Important Model Considerations
+
+- DimDate must be marked as the date table.
+- DimDate[Date] should have an active relationship with FactOrders[Order Date].
+- Dimension keys must be unique on the one side of relationships.
+- FactReturns should connect to FactOrders through a validated order-level dimension.
+- Return Rate should use a consistent order population and filter context.
+
+## 9. Conclusion
+
+DAX measures helped convert transactional information into meaningful performance indicators. These calculations support interactive analysis of sales, profitability, customers, products, shipping, and returns.

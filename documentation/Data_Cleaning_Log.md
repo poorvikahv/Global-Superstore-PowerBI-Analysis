@@ -1,136 +1,110 @@
-# Data Cleaning Log
+# Data Cleaning and Transformation Log
 
-## Dataset
+## 1. Introduction
 
-Source workbook: `Global Superstore.xls`\
-Power Query queries: `FactOrders`, `FactReturns`, `DimRegionalManager`
+Data cleaning and transformation were performed using Power Query in Microsoft Power BI. The purpose was to improve data consistency, correct data types, inspect duplicate records, and prepare the tables for data modeling and visualization.
 
-> Record the actual actions and results from your Power Query session.
-> Do not claim that an issue was found or fixed unless you verified it
-> in the source data.
+## 2. FactOrders – Orders Table
 
-## 1. FactOrders
+**Original Worksheet:** Orders  
+**Final Query Name:** FactOrders
 
-  ---------------------------------------------------------------------------------------------
-  Check / transformation  Action                  Validation / notes
-  ----------------------- ----------------------- ---------------------------------------------
-  Query name              Renamed `Orders` to     Confirmed in Queries pane
-                          `FactOrders`            
+### Cleaning and Transformation Activities
 
-  Row ID                  Checked for duplicate   Record duplicate count and action below
-                          identifiers             
+| Column | Transformation |
+|---|---|
+| Row ID | Checked for duplicate identifiers |
+| Order ID | Checked for null and blank values |
+| Order Date | Changed to Date |
+| Ship Date | Changed to Date |
+| Sales | Changed to Decimal Number |
+| Profit | Changed to Decimal Number |
+| Discount | Changed to Decimal Number |
+| Shipping Cost | Changed to Decimal Number |
+| Quantity | Changed to Whole Number |
+| Postal Code | Changed to Text |
+| City | Checked for blank values |
+| Country | Checked for blank values |
+| Category | Checked for blank values |
+| Segment | Checked for blank values |
+| Region | Checked for blank values |
 
-  Order ID                Checked for null or     Record count and treatment below
-                          blank values            
+### Duplicate Validation
 
-  Order Date              Set data type to Date   Verify no conversion errors
+The Row ID column was used to inspect duplicate transaction identifiers.
 
-  Ship Date               Set data type to Date   Verify no conversion errors
+The dataset contained 51,290 transaction rows and no duplicate Row ID values.
 
-  Sales                   Set data type to        Verify values
-                          Decimal Number          
+Order ID was not used as a duplicate-removal key because one order can contain multiple product transactions.
 
-  Profit                  Set data type to        Verify values
-                          Decimal Number          
+### Calculated Column – Delivery Days
 
-  Discount                Set data type to        Verify values
-                          Decimal Number          
+A custom column named Delivery Days was created using Power Query.
 
-  Shipping Cost           Set data type to        Verify values
-                          Decimal Number          
+```powerquery
+Duration.Days([Ship Date] - [Order Date])
+```
 
-  Quantity                Set data type to Whole  Verify values
-                          Number                  
+This calculates the number of calendar days between the order date and shipping date.
 
-  Postal Code             Set data type to Text   Preserves identifier formatting
+## 3. FactReturns – Returns Table
 
-  City, Country,          Checked for null /      Investigate before removing records
-  Category, Segment,      blank values            
-  Region                                          
+**Original Worksheet:** Returns  
+**Final Query Name:** FactReturns
 
-  Delivery Days           Added custom column     `Duration.Days([Ship Date] - [Order Date])`
-  ---------------------------------------------------------------------------------------------
+### Cleaning and Transformation Activities
 
-### FactOrders validation notes
+- Checked Order ID for null and blank values.
+- Inspected duplicate Order ID records.
+- Standardized the Returned column using Trim and Clean.
+- Retained Order ID and Returned for the final table.
 
--   Do not remove repeated `Order ID` values simply because they repeat:
-    an order can contain multiple product lines.
--   Use `Row ID` to investigate duplicate transaction rows.
--   Investigate negative delivery-day values and conversion errors.
--   Missing postal codes are not, by themselves, a reason to delete a
-    transaction.
+### Duplicate Validation
 
-**Observed row count before cleaning:** \[Fill in\]\
-**Observed row count after cleaning:** \[Fill in\]\
-**Duplicate Row ID count:** \[Fill in\]\
-**Null / blank Order ID count:** \[Fill in\]\
-**Other issues and resolutions:** \[Fill in\]
+The original Returns worksheet contained 1,173 records and 1,172 distinct Order IDs.
 
-## 2. FactReturns
+One Order ID appeared more than once. Duplicate records were inspected before deciding whether deduplication was appropriate.
 
-  -----------------------------------------------------------------------
-  Check / transformation  Action                  Validation / notes
-  ----------------------- ----------------------- -----------------------
-  Query name              Renamed `Returns` to    Confirmed in Queries
-                          `FactReturns`           pane
+The final table should retain one return record per order only after verifying that the repeated records have consistent return statuses.
 
-  Order ID                Checked for null /      Record count and
-                          blank values            treatment
+## 4. DimRegionalManager – People Table
 
-  Duplicate Order ID      Inspected repeated      Confirm return statuses
-                          order identifiers       agree before
-                                                  deduplication
+**Original Worksheet:** People  
+**Final Query Name:** DimRegionalManager
 
-  Returned                Applied Trim and Clean; Confirm standardized
-                          checked distinct values values
+### Cleaning and Transformation Activities
 
-  Columns                 Retained `Order ID` and Verify final columns
-                          `Returned`              
-  -----------------------------------------------------------------------
+- Checked Region for blank values.
+- Checked regional uniqueness.
+- Verified the relationship between Region and Person.
+- Renamed Person to Regional Manager.
 
-**Observed row count before cleaning:** \[Fill in\]\
-**Observed row count after cleaning:** \[Fill in\]\
-**Duplicate Order ID count:** \[Fill in\]\
-**Conflicting return statuses:** \[Fill in\]
+Regional manager information was merged into DimRegion using a Left Outer join on Region.
 
-Do not use **Keep Duplicates** as a final cleaning step. It is only an
-inspection step; remove that temporary step before continuing. Do not
-remove repeated order IDs if they represent conflicting or meaningful
-records without investigating them.
+This made regional manager information available for regional performance analysis.
 
-## 3. DimRegionalManager
+## 5. Data Modeling Preparation
 
-  -----------------------------------------------------------------------
-  Check / transformation  Action                  Validation / notes
-  ----------------------- ----------------------- -----------------------
-  Query name              Renamed `People` to     Confirmed in Queries
-                          `DimRegionalManager`    pane
+The following dimension tables were created:
 
-  Region                  Checked for null /      Record findings
-                          blank values            
+- DimCustomer
+- DimProduct
+- DimRegion
+- DimOrder
+- DimDate
 
-  Region uniqueness       Checked that each       Resolve conflicts
-                          region maps to one      before deduplication
-                          manager                 
+Relationships were established using corresponding identifier columns.
 
-  Person                  Renamed to              Confirmed
-                          `Regional Manager`      
-  -----------------------------------------------------------------------
+The model was designed to use one-to-many relationships with single-direction filtering wherever applicable.
 
-The regional manager data was merged into `DimRegion` using a Left Outer
-join on Region. Verify that the merge produced a manager for each
-expected region and did not multiply rows.
+## 6. Data Quality Considerations
 
-**Number of regions:** \[Fill in\]\
-**Missing manager values:** \[Fill in\]\
-**Conflicting region-manager mappings:** \[Fill in\]
+- Missing Postal Code values were not automatically treated as invalid transactions.
+- Repeated Order IDs were not automatically considered duplicate transactions.
+- Date and numerical columns were checked for appropriate data types.
+- Blank values were investigated before deciding whether records required correction.
+- Delivery Days values were checked for errors and unexpected negative durations.
 
-## 4. Final validation
+## 7. Conclusion
 
--   [ ] No unintended Power Query errors remain.
--   [ ] Data types are correct.
--   [ ] Temporary inspection steps (such as Keep Duplicates) were
-    removed.
--   [ ] Row counts were checked before and after transformations.
--   [ ] Relationships use unique keys on the one side.
--   [ ] Missing values were investigated rather than blindly deleted.
+The cleaning and transformation process prepared the Global Superstore dataset for analysis in Power BI. The resulting tables support sales analysis, profitability calculations, regional comparisons, and operational reporting.
